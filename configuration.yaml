@@ -1,0 +1,1398 @@
+kiosk_mode:
+  non_admin_settings:
+    hide_header: true
+    hide_menubutton: true
+    ignore_entity_settings: true
+views:
+  - title: Floorplan
+    icon: mdi:floor-plan
+    panel: true
+    cards:
+      - type: custom:floorplan-card
+        card_mod:
+          style: |
+            ha-card {
+              max-width: 250vh;
+              margin: 0 auto;
+              background: none;
+              box-shadow: none;
+            }
+        config:
+          image: /local/floorplan4k/floorplan4koptimised.svg
+          stylesheet: /local/floorplan4k/floorplan4k.css
+          rules:
+            - entities:
+                - light.master_bedroom
+                - light.kitchen_light
+                - light.living_room_light
+                - light.steven_s_ceiling_light
+                - light.bathroom_light
+                - light.hallway_light
+                - light.toilet_light
+              tap_action: false
+              state_action:
+                action: call-service
+                service: floorplan.class_set
+                service_data: light-${entity.state}
+            - entities:
+                - light.master_bedroom
+                - light.kitchen_light
+                - light.living_room_light
+                - light.steven_s_ceiling_light
+                - light.bathroom_light
+                - light.hallway_light
+                - light.toilet_light
+              tap_action:
+                action: toggle
+              hold_action:
+                action: more-info
+              state_action:
+                action: call-service
+                service: floorplan.style_set
+                service_data:
+                  element: ${entity.entity_id.replace('light.', 'light_overlay.')}
+                  style: |
+                    >
+                    if( entity.state !== "on" )
+                        return "display: none;";
+                    let hue = 0;
+                    let sat = 0;
+                    if( entity.attributes.hs_color )
+                    {
+                        hue = entity.attributes.hs_color[0];
+                        sat = entity.attributes.hs_color[1];
+                    }
+                    if( sat < 10 )
+                    {
+                      return `
+                        display: block;
+                        filter:
+                          brightness(calc( ${entity.attributes.brightness} / 255));`
+                    }
+                    return `
+                      display: block;
+                      filter:
+                        sepia(100%)
+                        hue-rotate(calc( ${hue}deg - 55deg ))
+                        saturate(calc( ${sat}% * 2 ))
+                        brightness(calc( ${entity.attributes.brightness} / 255));
+                    `
+            - entities:
+                - media_player.bedroom
+              tap_action:
+                action: call-service
+                service: media_player.turn_on
+              double_tap_action:
+                action: navigate
+                navigation_path: /dashboard-floorplan/tv/
+                service: media_player.turn_on
+              hold_action:
+                action: call-service
+                service: media_player.turn_off
+              state_action:
+                action: call-service
+                service: floorplan.style_set
+                service_data:
+                  element: >-
+                    ${entity.entity_id.replace('media_player.',
+                    'light_overlay.')}
+                  style: |
+                    >
+                    if( entity.state == "standby" )
+                        return "display: none;";
+                    let hue = 0;
+                    let sat = 0;
+                    if( entity.attributes.hs_color )
+                    {
+                        hue = entity.attributes.hs_color[0];
+                        sat = entity.attributes.hs_color[1];
+                    }
+                    if( sat < 10 )
+                    {
+                      return `
+                        display: block;
+                        filter:
+                          brightness(calc( ${entity.attributes.brightness} / 255));`
+                    }
+                    return `
+                      display: block;
+                      filter:
+                        sepia(100%)
+                        hue-rotate(calc( ${hue}deg - 55deg ))
+                        saturate(calc( ${sat}% * 2 ))
+                        brightness(calc( ${entity.attributes.brightness} / 255));
+                    `  
+            - entities:
+                - switch.main
+              tap_action:
+                action: toggle
+              state_action:
+                action: call-service
+                service: floorplan.style_set
+                service_data:
+                  element: ${entity.entity_id.replace('switch.', 'light_overlay.')}
+                  style: |
+                    >
+                    if( entity.state !== "on" )
+                        return "display: none;";
+                    let hue = 0;
+                    let sat = 0;
+                    if( entity.attributes.hs_color )
+                    {
+                        hue = entity.attributes.hs_color[0];
+                        sat = entity.attributes.hs_color[1];
+                    }
+                    if( sat < 10 )
+                    {
+                      return `
+                        display: block;
+                        filter:
+                          brightness(calc( ${entity.attributes.brightness} / 255));`
+                    }
+                    return `
+                      display: block;
+                      filter:
+                        sepia(100%)
+                        hue-rotate(calc( ${hue}deg - 55deg ))
+                        saturate(calc( ${sat}% * 2 ))
+                        brightness(calc( ${entity.attributes.brightness} / 255));
+                    `
+    type: panel
+  - title: Dashboard
+    cards:
+      - type: custom:gap-card
+      - type: custom:floorplan-card
+        card_mod:
+          style: |
+            ha-card {
+                max-width: 150vh;
+                margin: 0 auto;
+                background: none;
+                box-shadow: none;
+            }
+        config:
+          image: /local/floorplan4k/floorplan4koptimised.svg
+          stylesheet: /local/floorplan4k/floorplan4k.css
+          rules:
+            - entities:
+                - binary_sensor.kitchen_motion
+              state_action:
+                action: call-service
+                service: floorplan.class_set
+                service_data: motion motion-${entity.state}
+            - entities:
+                - light.master_bedroom
+                - light.kitchen_light
+                - light.living_room_light
+                - light.steven_s_ceiling_light
+                - light.bathroom_light
+                - light.hallway_light
+                - light.toilet_light
+              tap_action: false
+              state_action:
+                action: call-service
+                service: floorplan.class_set
+                service_data: light-${entity.state}
+            - entities:
+                - light.master_bedroom
+                - light.kitchen_light
+                - light.living_room_light
+                - light.steven_s_ceiling_light
+                - light.bathroom_light
+                - light.hallway_light
+                - light.toilet_light
+              tap_action:
+                action: toggle
+              double_tap_action:
+                action: more-inf
+              hold_action:
+                action: more-info
+              state_action:
+                action: call-service
+                service: floorplan.style_set
+                service_data:
+                  element: ${entity.entity_id.replace('light.', 'light_overlay.')}
+                  style: |
+                    >
+                    if( entity.state !== "on" )
+                        return "display: none;";
+                    let hue = 0;
+                    let sat = 0;
+                    if( entity.attributes.hs_color )
+                    {
+                        hue = entity.attributes.hs_color[0];
+                        sat = entity.attributes.hs_color[1];
+                    }
+                    if( sat < 10 )
+                    {
+                      return `
+                        display: block;
+                        filter:
+                          brightness(calc( ${entity.attributes.brightness} / 255));`
+                    }
+                    return `
+                      display: block;
+                      filter:
+                        sepia(100%)
+                        hue-rotate(calc( ${hue}deg - 55deg ))
+                        saturate(calc( ${sat}% * 2 ))
+                        brightness(calc( ${entity.attributes.brightness} / 255));
+                    `
+      - type: vertical-stack
+        cards:
+          - type: vertical-stack
+            cards:
+              - type: custom:mushroom-title-card
+                title: ''
+                subtitle: Lights
+              - type: horizontal-stack
+                cards:
+                  - type: custom:button-card
+                    entity: light.hallway_light
+                    name: Hallway
+                    icon: mdi:door-open
+                    show_state: true
+                    tap_action:
+                      action: toggle
+                    double_tap_action:
+                      action: more-info
+                    hold_action:
+                      action: more-info
+                    layout: icon_name_state2nd
+                    styles:
+                      card:
+                        - padding: 0px
+                        - height: 60px
+                      img_cell:
+                        - align-self: center
+                        - text-align: center
+                      name:
+                        - justify-self: start
+                        - padding-left: null
+                        - font-weight: 600
+                        - font-size: 14px
+                      state:
+                        - justify-self: start
+                        - font-size: 12px
+                        - font-weight: 300
+                        - padding-bottom: 10px
+                        - padding-top: px
+                      icon:
+                        - width: 35px
+                    state:
+                      - value: 'off'
+                        styles:
+                          card: null
+                          icon: null
+                      - value: 'on'
+                        styles:
+                          card:
+                            - background-color: rgba(255, 255, 255,.8)
+                          icon:
+                            - color: '#FF9500'
+                          name:
+                            - color: black
+                          state:
+                            - color: black
+                  - type: custom:button-card
+                    entity: light.toilet_light
+                    name: Toilet
+                    icon: mdi:toilet
+                    show_state: true
+                    tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    layout: icon_name_state2nd
+                    styles:
+                      card:
+                        - padding: 0px
+                        - height: 60px
+                      img_cell:
+                        - align-self: center
+                        - text-align: center
+                      name:
+                        - justify-self: start
+                        - padding-left: null
+                        - font-weight: 600
+                        - font-size: 14px
+                      state:
+                        - justify-self: start
+                        - font-size: 12px
+                        - font-weight: 300
+                        - padding-bottom: 10px
+                        - padding-top: px
+                      icon:
+                        - width: 35px
+                    state:
+                      - value: 'off'
+                        styles:
+                          card: null
+                          icon: null
+                      - value: 'on'
+                        styles:
+                          card:
+                            - background-color: rgba(255, 255, 255,.8)
+                          icon:
+                            - color: '#FF9500'
+                          name:
+                            - color: black
+                          state:
+                            - color: black
+              - type: horizontal-stack
+                cards:
+                  - type: custom:button-card
+                    entity: light.master_bedroom_light
+                    name: Master Bedroom
+                    icon: mdi:bed-king
+                    show_state: true
+                    tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    layout: icon_name_state2nd
+                    styles:
+                      card:
+                        - padding: 0px
+                        - height: 60px
+                      img_cell:
+                        - align-self: center
+                        - text-align: center
+                      name:
+                        - justify-self: start
+                        - padding-left: null
+                        - font-weight: 600
+                        - font-size: 14px
+                      state:
+                        - justify-self: start
+                        - font-size: 12px
+                        - font-weight: 300
+                        - padding-bottom: 10px
+                        - padding-top: px
+                      icon:
+                        - width: 35px
+                    state:
+                      - value: 'off'
+                        styles:
+                          card: null
+                          icon: null
+                      - value: 'on'
+                        styles:
+                          card:
+                            - background-color: rgba(255, 255, 255,.8)
+                          icon:
+                            - color: '#FF9500'
+                          name:
+                            - color: black
+                          state:
+                            - color: black
+                  - type: custom:button-card
+                    entity: light.steven_s_ceiling_light
+                    name: Steven
+                    icon: mdi:bed
+                    show_state: true
+                    tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    layout: icon_name_state2nd
+                    styles:
+                      card:
+                        - padding: 0px
+                        - height: 60px
+                      img_cell:
+                        - align-self: center
+                        - text-align: center
+                      name:
+                        - justify-self: start
+                        - padding-left: null
+                        - font-weight: 600
+                        - font-size: 14px
+                      state:
+                        - justify-self: start
+                        - font-size: 12px
+                        - font-weight: 300
+                        - padding-bottom: 10px
+                        - padding-top: px
+                      icon:
+                        - width: 35px
+                    state:
+                      - value: 'off'
+                        styles:
+                          card: null
+                          icon: null
+                      - value: 'on'
+                        styles:
+                          card:
+                            - background-color: rgba(255, 255, 255,.8)
+                          icon:
+                            - color: '#FF9500'
+                          name:
+                            - color: black
+                          state:
+                            - color: black
+          - type: vertical-stack
+            cards:
+              - type: custom:mushroom-title-card
+                title: ''
+                subtitle: Desk
+              - type: horizontal-stack
+                cards:
+                  - type: custom:button-card
+                    entity: switch.main
+                    name: FormD T1
+                    icon: fas:computer
+                    show_state: true
+                    tap_action:
+                      action: toggle
+                    hold_action:
+                      action: more-info
+                    layout: icon_name_state2nd
+                    styles:
+                      card:
+                        - padding: 0px
+                        - height: 60px
+                      img_cell:
+                        - align-self: center
+                        - text-align: center
+                      name:
+                        - justify-self: start
+                        - padding-left: null
+                        - font-weight: 600
+                        - font-size: 14px
+                      state:
+                        - justify-self: start
+                        - font-size: 12px
+                        - font-weight: 300
+                        - padding-bottom: 10px
+                        - padding-top: px
+                      icon:
+                        - width: 35px
+                    state:
+                      - value: 'off'
+                        styles:
+                          card: null
+                          icon: null
+                      - value: 'on'
+                        styles:
+                          card:
+                            - background-color: rgba(255, 255, 255,.8)
+                          icon:
+                            - color: '#FF9500'
+                          name:
+                            - color: black
+                          state:
+                            - color: black
+                  - type: custom:gap-card
+          - type: vertical-stack
+            cards:
+              - type: custom:mushroom-title-card
+                title: ''
+                subtitle: Media
+                card_mod:
+                  style: |
+                    ha-card: {
+                      --card-primary-font-size: 50px !important;
+                      --card-secondary-font-size: 50px !important;
+                      }
+              - type: horizontal-stack
+                cards:
+                  - type: custom:button-card
+                    entity: media_player.bedroom
+                    name: Apple TV
+                    icon: phu:apple-tv
+                    show_state: true
+                    tap_action:
+                      action: navigate
+                      navigation_path: /dashboard-floorplan/tv/
+                    hold_action:
+                      action: toggle
+                    styles:
+                      card:
+                        - padding: 0px
+                        - height: 128px
+                      grid:
+                        - grid-template-areas: '"i" "n" "s"'
+                        - grid-template-columns: 1fr
+                        - grid-template-rows: 1fr min-content min-content
+                      img_cell:
+                        - align-self: center
+                        - text-align: center
+                      name:
+                        - justify-self: center
+                        - padding-left: null
+                        - font-weight: 600
+                        - font-size: 14px
+                      state:
+                        - justify-self: center
+                        - font-size: 12px
+                        - font-weight: 300
+                        - padding-bottom: 10px
+                    state:
+                      - value: standby
+                        styles:
+                          card: null
+                          icon: null
+                      - value: playing
+                        styles:
+                          card:
+                            - background-color: rgba(255, 255, 255, 0.8)
+                          icon:
+                            - color: '#0171A4'
+                          name:
+                            - color: black
+                          state:
+                            - color: black
+                      - value: paused
+                        styles:
+                          card:
+                            - background-color: rgba(255, 255, 255, 0.8)
+                          icon:
+                            - color: '#0171A4'
+                          name:
+                            - color: black
+                          state:
+                            - color: black
+                      - value: idle
+                        styles:
+                          card:
+                            - background-color: rgba(255, 255, 255, 0.8)
+                          icon:
+                            - color: '#0171A4'
+                          name:
+                            - color: black
+                          state:
+                            - color: black
+                  - type: custom:gap-card
+    badges: []
+    dense_section_placement: true
+    icon: mdi:monitor-dashboard
+  - icon: phu:apple-tv
+    path: tv
+    title: TV
+    cards:
+      - type: vertical-stack
+        cards:
+          - type: custom:stack-in-card
+            card_mod:
+              style: |
+                ha-card {
+                  z-index: 0;
+                  height: 45px;
+                  padding: 4px 10px;
+                  border-radius: 10px;
+                  position: fixed;
+                  right: 8px;
+                  left: 8px;
+                  top: 8px;
+                }
+            cards:
+              - type: custom:mushroom-chips-card
+                chips:
+                  - type: back
+                  - type: spacer
+                  - type: entity
+                    entity: media_player.bedroom
+                    icon: phu:apple-tv
+                    content: Bedroom On
+                  - type: spacer
+                  - type: action
+                    hold_action:
+                      action: call-service
+                      service: media_player.turn_off
+                      target:
+                        entity_id:
+                          - media_player.bedroom
+                          - input_boolean.bedroom_apple_tv_status
+                    tap_action:
+                      action: call-service
+                      service: media_player.turn_on
+                      target:
+                        entity_id:
+                          - media_player.bedroom
+                          - input_boolean.bedroom_apple_tv_status
+                    icon: mdi:power
+                    content_info: none
+                card_mod:
+                  style: |
+                    :host {
+                      --chip-background: rgba(0, 0, 0, 0) !important; /* Change this to your desired color */
+                    }
+          - type: custom:mod-card
+            card_mod:
+              style: |
+                /* Styles for mobile devices */
+                @media (max-width: 767px) {
+                  ha-card {
+                    z-index: 2;
+                    position: fixed;
+                    top: 61px;
+                    left: 8px;
+                    right: 8px;
+                    height: 45px;
+
+                    background: RGBA(0, 0, 0, 0.5);
+                    opacity: 1;
+                    border-color: white;
+                    border-width: 3px;
+                    padding: 0px;
+                    padding-left: 30px;
+                    padding-right: 30px;
+                    border-top-left-radius: 10px;
+                    border-top-right-radius: 10px;
+                    border-bottom-left-radius: 0px;
+                    border-bottom-right-radius: 0px;
+                  }
+                }
+                /* Styles for desktop devices */
+                @media (min-width: 768px) {
+                  ha-card {
+                    z-index: -1;
+                    position: fixed;
+                    bottom: 0px;
+                    left: 0px;
+                    width: 20%;
+                    desktop-width: 25px;
+                    height: 75px;
+
+                    background: RGBA(0,0,0,0.50);
+                    opacity: 1;
+                    border-radius: 5px;
+                    padding-left: 25%;
+
+                    /* Center the card horizontally */
+                    margin-left: auto;
+                    margin-right: auto;        
+                  }
+                }
+                @media (min-width:100%) {
+                  ha-card {
+                    width:100%;
+                    left:100%;
+                  }
+                }
+            card:
+              type: grid
+              square: false
+              columns: 5
+              style:
+                z-index: 30
+              cards:
+                - type: custom:button-card
+                  icon: phu:apple-tv
+                  tap_action:
+                    action: call-service
+                    service: media_player.select_source
+                    target:
+                      entity_id: media_player.bedroom
+                    data:
+                      source: TV
+                  styles:
+                    icon:
+                      - width: 25px
+                      - color: rgba(255,255,255,0.8)
+                    img_cell:
+                      - width: 40px
+                      - height: 40px
+                      - top: 10px
+                    card:
+                      - background: none
+                      - padding: 0
+                - type: custom:button-card
+                  icon: mdi:twitch
+                  tap_action:
+                    action: call-service
+                    service: media_player.select_source
+                    service_data:
+                      entity_id: media_player.bedroom
+                      source: Twitch
+                  styles:
+                    icon:
+                      - width: 25px
+                      - color: rgba(255,255,255,0.8)
+                    img_cell:
+                      - width: 40px
+                      - height: 40px
+                      - top: 10px
+                    card:
+                      - background: none
+                      - padding: 0
+                - type: custom:button-card
+                  icon: phu:youtube
+                  tap_action:
+                    action: call-service
+                    service: media_player.select_source
+                    service_data:
+                      entity_id: media_player.bedroom
+                      source: YouTube
+                  styles:
+                    icon:
+                      - width: 25px
+                      - color: rgba(255,255,255,0.8)
+                    img_cell:
+                      - width: 40px
+                      - height: 40px
+                      - top: 10px
+                    card:
+                      - background: none
+                      - padding: 0
+                - type: custom:button-card
+                  icon: phu:prime-video
+                  tap_action:
+                    action: call-service
+                    service: media_player.select_source
+                    service_data:
+                      entity_id: media_player.bedroom
+                      source: Prime Video
+                  styles:
+                    icon:
+                      - width: 25px
+                      - color: rgba(255,255,255,0.8)
+                    img_cell:
+                      - width: 40px
+                      - height: 40px
+                      - top: 10px
+                    card:
+                      - background: none
+                      - padding: 0
+                - type: custom:button-card
+                  icon: phu:infuse-pro
+                  tap_action:
+                    action: call-service
+                    service: media_player.select_source
+                    target:
+                      entity_id: media_player.bedroom
+                    data:
+                      source: Infuse
+                  styles:
+                    icon:
+                      - width: 25px
+                      - color: rgba(255,255,255,0.8)
+                    img_cell:
+                      - width: 40px
+                      - height: 40px
+                      - top: 10px
+                    card:
+                      - background: none
+                      - padding: 0
+          - type: custom:android-tv-card
+            remote_id: remote.bedroom
+            media_player_id: media_player.bedroom
+            autofill_entity_id: true
+            rows:
+              - - touchpad
+            custom_actions:
+              - type: button
+                name: power
+                tap_action:
+                  action: key
+                  key: power
+                icon: mdi:power
+                hold_action:
+                  action: key
+                  key: power
+              - type: button
+                name: menu
+                tap_action:
+                  action: key
+                  key: menu
+                icon: mdi:backspace
+              - type: button
+                name: home
+                tap_action:
+                  action: key
+                  key: home
+                icon: mdi:home
+                hold_action:
+                  action: more-info
+              - icon: mdi:rewind-10
+                tap_action:
+                  action: key
+                  key: skip_backward
+                name: skip-backward
+                type: button
+              - icon: mdi:fast-forward-10
+                action: key
+                name: skip-forward
+                tap_action:
+                  key: skip_forward
+                  action: key
+                type: button
+              - type: button
+                name: play
+                tap_action:
+                  action: key
+                  key: play
+                icon: mdi:play
+              - type: button
+                name: pause
+                tap_action:
+                  action: key
+                  key: pause
+                icon: mdi:pause
+              - type: button
+                name: up
+                tap_action:
+                  action: key
+                  key: up
+                hold_action:
+                  action: repeat
+                icon: mdi:chevron-up
+              - type: button
+                name: down
+                tap_action:
+                  action: key
+                  key: down
+                hold_action:
+                  action: repeat
+                icon: mdi:chevron-down
+              - type: button
+                name: left
+                tap_action:
+                  action: key
+                  key: left
+                hold_action:
+                  action: repeat
+                icon: mdi:chevron-left
+              - type: button
+                name: right
+                tap_action:
+                  action: key
+                  key: right
+                hold_action:
+                  action: repeat
+                icon: mdi:chevron-right
+              - type: button
+                name: center
+                tap_action:
+                  action: key
+                  key: select
+                icon: mdi:checkbox-blank-circle
+                double_tap_action:
+                  action: key
+                  key: menu
+              - type: button
+                name: primevideo
+                tap_action:
+                  action: perform-action
+                  data:
+                    source: Prime Video
+                  perform_action: media_player.select_source
+                icon: primevideo
+              - type: button
+                name: netflix
+                tap_action:
+                  action: perform-action
+                  data:
+                    source: Netflix
+                  perform_action: media_player.select_source
+                icon: mdi:netflix
+              - type: button
+                name: spotify
+                tap_action:
+                  action: perform-action
+                  data:
+                    source: Spotify
+                  perform_action: media_player.select_source
+                icon: mdi:spotify
+              - type: button
+                name: disney
+                tap_action:
+                  action: perform-action
+                  data:
+                    source: Disney+
+                  perform_action: media_player.select_source
+                icon: disney
+              - type: button
+                name: youtube
+                tap_action:
+                  action: perform-action
+                  data:
+                    source: YouTube
+                  perform_action: media_player.select_source
+                icon: mdi:youtube
+              - type: button
+                name: appletv
+                tap_action:
+                  action: perform-action
+                  data:
+                    source: TV
+                  perform_action: media_player.select_source
+                icon: appletv
+              - type: button
+                name: max
+                tap_action:
+                  action: perform-action
+                  data:
+                    source: HBO Max
+                  perform_action: media_player.select_source
+                icon: max
+              - type: button
+                name: skyshowtime
+                tap_action:
+                  action: perform-action
+                  data:
+                    source: SkyShowtime
+                  perform_action: media_player.select_source
+                icon: showtime
+              - type: button
+                name: plex
+                tap_action:
+                  action: perform-action
+                  data:
+                    source: Plex
+                  perform_action: media_player.select_source
+                icon: mdi:plex
+              - type: button
+                name: discovery
+                tap_action:
+                  action: perform-action
+                  data:
+                    source: discovery+
+                  perform_action: media_player.select_source
+                icon: discovery
+              - type: button
+                name: viaplay
+                tap_action:
+                  action: perform-action
+                  data:
+                    source: Viaplay
+                  perform_action: media_player.select_source
+                icon: viaplay
+              - type: button
+                name: tv2play
+                tap_action:
+                  action: perform-action
+                  data:
+                    source: TV 2 Play
+                  perform_action: media_player.select_source
+                icon: tv2play
+              - type: button
+                name: nrktv
+                tap_action:
+                  action: perform-action
+                  data:
+                    source: NRK TV
+                  perform_action: media_player.select_source
+                icon: nrktv
+              - type: button
+                name: allente
+                tap_action:
+                  action: perform-action
+                  data:
+                    source: Allente
+                  perform_action: media_player.select_source
+                icon: allente
+              - type: touchpad
+                name: touchpad
+                tap_action:
+                  action: key
+                  key: select
+                up:
+                  tap_action:
+                    action: key
+                    key: up
+                  hold_action:
+                    action: repeat
+                  name: up
+                  type: button
+                down:
+                  tap_action:
+                    action: key
+                    key: down
+                  hold_action:
+                    action: repeat
+                  name: down
+                  type: button
+                left:
+                  tap_action:
+                    action: key
+                    key: left
+                  hold_action:
+                    action: repeat
+                  name: left
+                  type: button
+                right:
+                  tap_action:
+                    action: key
+                    key: right
+                  hold_action:
+                    action: repeat
+                  name: right
+                  type: button
+                styles: |-
+                  toucharea {
+                    height: 625px;
+                    background-image: url('https://i.ibb.co/pbf8yC8/swipe-nav.png');
+                    background-color: RGBA(0,0,0,0);
+                    background-size: 55%;
+                    background-repeat: no-repeat;
+                    background-position: center;
+                    border-radius: 0px 0px 0px 0px;
+                    opacity: 1;
+                    padding-top: 0px;
+                    padding-bottom: 20px;
+                    position: null;
+                    padding-left: 0px;
+                    padding-right: 0px;
+                    width: auto;
+                  }
+                double_tap_action:
+                  action: key
+                  key: menu
+            platform: Apple TV
+            keyboard_id: media_player.bedroom
+            card_mod:
+              style: |
+                @media (max-width: 767px) {
+                ha-card {
+                  z-index: 1 !important;
+                  position: fixed !important; /* Change to fixed or absolute as needed */
+                  background: RGBA(0, 0, 0, 0.5);
+                  left: 8px;
+                  right: 8px;
+                  top: 106px !important;
+                  bottom: 193px;
+                  padding-top: 0px;
+                  padding-bottom: 0px !important; 
+                  padding-left: 0px !important;
+                  padding-right: 0px !important;
+                  padding-top: 0px !important;
+                  border-top-left-radius: 0px;
+                  border-top-right-radius: 0px;
+                  border-bottom-left-radius: 0px;
+                  border-bottom-right-radius: 0px;
+                  }
+                }    
+          - type: custom:button-card
+            show_icon: false
+            show_name: false
+            show_state: false
+            styles:
+              grid:
+                - grid-template-areas: '"content"'
+                - grid-template-columns: 1fr
+                - grid-template-rows: max-content
+              card:
+                - background-color: rgba(0,0,0,0.5)
+                - webkit-backdrop-filter: blur(10px); !important;}
+                - box-shadow: none
+                - border-radius: 0px 0px 10px 10px
+                - border-width: 0px
+                - padding: 15px
+                - margin: 0px
+                - height: 185px
+            custom_fields:
+              content:
+                card:
+                  type: vertical-stack
+                  cards:
+                    - type: custom:my-slider-v2
+                      entity: media_player.bedroom
+                      mode: seekbar
+                      min: 0
+                      max: 100
+                      styles:
+                        card:
+                          - height: 20px
+                          - box-shadow: none
+                          - margin: 20px 0 0 0
+                          - background: none
+                        container:
+                          - border-radius: 10px
+                          - background: none
+                          - padding: 0 0 0 5px
+                        track:
+                          - background: rgba(255,255,255,0.3)
+                          - border-radius: 99px
+                          - padding: 0 0px 0 0px
+                          - width: 97%
+                          - height: 7px
+                          - margin: 0px 0 0 0
+                        progress:
+                          - background: rgba(255,255,255,0.9)
+                          - border-radius: 25px 0px 0px 25px
+                          - height: 7px
+                          - margin: 0 0 0 0
+                        thumb:
+                          - background: rgba(255,255,255,0.9)
+                          - width: 5px
+                          - height: 7px
+                          - border-radius: 0px
+                    - type: custom:button-card
+                      entity: media_player.bedroom
+                      show_entity_picture: false
+                      show_name: false
+                      show_icon: false
+                      custom_fields:
+                        buttons:
+                          card:
+                            type: custom:button-card
+                            custom_fields:
+                              previous:
+                                card:
+                                  type: custom:button-card
+                                  tap_action:
+                                    action: call-service
+                                    service: remote.send_command
+                                    target:
+                                      entity_id: remote.bedroom
+                                    data:
+                                      command: menu
+                                  icon: mdi:backspace
+                                  show_name: false
+                                  styles:
+                                    card:
+                                      - border-radius: 5px
+                                      - border-width: 0px
+                                      - box-shadow: none
+                                      - background: rgba(255,255,255,0.0)
+                                      - align-self: end
+                                      - align-content: end
+                                      - padding: 0px
+                                      - margin: 0px
+                                    icon:
+                                      - width: 40px
+                                      - color: rgba(255,255,255,0.8)
+                              play:
+                                card:
+                                  type: custom:button-card
+                                  tap_action:
+                                    action: call-service
+                                    service: media_player.media_play_pause
+                                    target:
+                                      entity_id: media_player.bedroom
+                                  hold_action:
+                                    action: call-service
+                                    service: media_player.turn_off
+                                    target:
+                                      entity_id:
+                                        - media_player.bedroom
+                                  entity: media_player.bedroom
+                                  icon: mdi:play
+                                  state:
+                                    - value: playing
+                                      icon: mdi:pause
+                                  show_name: false
+                                  styles:
+                                    card:
+                                      - border-radius: 5px
+                                      - border-width: 0px
+                                      - box-shadow: none
+                                      - background: rgba(255,255,255,0.0)
+                                      - align-self: end
+                                      - align-content: end
+                                      - padding: 0px
+                                      - margin-bottom: 0px
+                                    icon:
+                                      - width: 55px
+                                      - color: rgba(255,255,255,0.8)
+                              next:
+                                card:
+                                  type: custom:button-card
+                                  tap_action:
+                                    action: call-service
+                                    service: remote.send_command
+                                    target:
+                                      entity_id: remote.bedroom
+                                    data:
+                                      command: home
+                                  icon: mdi:home
+                                  show_name: false
+                                  styles:
+                                    card:
+                                      - border-radius: 5px
+                                      - border-width: 0px
+                                      - box-shadow: none
+                                      - background: rgba(255,255,255,0.0)
+                                      - align-self: end
+                                      - align-content: end
+                                    icon:
+                                      - width: 40px
+                                      - color: rgba(255,255,255,0.8)
+                              star:
+                                card:
+                                  type: custom:button-card
+                                  tap_action:
+                                    action: call-service
+                                    service: remote.send_command
+                                    target:
+                                      entity_id: remote.bedroom
+                                    data:
+                                      command: left
+                                  icon: mdi:rewind-10
+                                  show_name: false
+                                  styles:
+                                    card:
+                                      - border-radius: 5px
+                                      - border-width: 0px
+                                      - box-shadow: none
+                                      - background: rgba(255,255,255,0.0)
+                                      - align-self: end
+                                      - align-content: end
+                                    icon:
+                                      - width: 20px
+                                      - color: rgba(255,255,255,0.5)
+                              menu:
+                                card:
+                                  type: custom:button-card
+                                  entity: media_player.bedroom
+                                  tap_action:
+                                    action: call-service
+                                    service: remote.send_command
+                                    target:
+                                      entity_id: remote.bedroom
+                                    data:
+                                      command: right
+                                  icon: mdi:fast-forward-10
+                                  show_name: false
+                                  styles:
+                                    card:
+                                      - border-radius: 5px
+                                      - border-width: 0px
+                                      - box-shadow: none
+                                      - background: rgba(255,255,255,0.0)
+                                      - align-self: end
+                                      - align-content: end
+                                    icon:
+                                      - width: 20px
+                                      - color: rgba(255,255,255,0.5)
+                            styles:
+                              grid:
+                                - grid-template-columns: 2fr 3fr 3fr 3fr 2fr
+                                - grid-template-rows: min-content
+                                - grid-template-areas: '"star previous play next menu"'
+                              card:
+                                - padding: 0 0 0 0px
+                                - margin: 3px 0px -6px 0px
+                                - align-self: end
+                                - background: none
+                                - box-shadow: none
+                                - border-width: 0px
+                                - border-radius: 0px
+                      styles:
+                        grid:
+                          - grid-template-areas: '"buttons"'
+                          - grid-template-columns: 1fr
+                          - grid-template-rows: max-content max-content max-content max-content;
+                          - align-items: end
+                        card:
+                          - background: transparent
+                          - box-shadow: none
+                          - border-radius: 0px
+                          - border-width: 0px
+                          - padding: 0px 0px 15px 0px
+                          - margin: 0px 0px 0px 0px
+                    - type: custom:button-card
+                      entity: media_player.bedroom
+                      show_entity_picture: false
+                      show_name: false
+                      show_icon: false
+                      custom_fields:
+                        volume_control:
+                          card:
+                            type: horizontal-stack
+                            cards:
+                              - type: custom:button-card
+                                tap_action:
+                                  action: call-service
+                                  service: media_player.volume_down
+                                  target:
+                                    entity_id:
+                                      - media_player.s95b
+                                icon: mdi:volume-medium
+                                show_name: false
+                                styles:
+                                  card:
+                                    - border-radius: 25px
+                                    - width: 30px
+                                    - border-width: 0px
+                                    - box-shadow: none
+                                    - background: rgba(255,255,255,0.0)
+                                    - align-self: end
+                                    - align-content: end
+                                  icon:
+                                    - width: 20px
+                                    - color: rgba(255,255,255,0.5)
+                              - type: custom:my-slider-v2
+                                entity: media_player.s95b
+                                attribute: volume_level
+                                min: 0
+                                max: 50
+                                step: 2
+                                styles:
+                                  card:
+                                    - box-shadow: none
+                                    - margin: 9px 0 0 0
+                                    - background: none
+                                  container:
+                                    - border-radius: 0px
+                                    - background: none
+                                    - padding: 0 0 0 0px
+                                  track:
+                                    - background: rgba(255,255,255,0.3)
+                                    - border-radius: 99px
+                                    - width: 100%
+                                    - height: 7px
+                                    - margin: 0px 0 0 0
+                                  progress:
+                                    - background: rgba(255,255,255,0.9)
+                                    - border-radius: 25px 0px 0px 25px
+                                    - height: 7px
+                                  thumb:
+                                    - background: rgba(255,255,255,0.9)
+                                    - width: 5px
+                                    - height: 7px
+                                    - border-radius: 0px
+                              - type: custom:button-card
+                                tap_action:
+                                  action: call-service
+                                  service: media_player.volume_up
+                                  target:
+                                    entity_id:
+                                      - media_player.s95b
+                                icon: mdi:volume-high
+                                show_name: false
+                                styles:
+                                  card:
+                                    - border-radius: 5px
+                                    - width: 30px
+                                    - border-width: 0px
+                                    - box-shadow: none
+                                    - background: rgba(255,255,255,0.0)
+                                    - align-self: end
+                                    - align-content: end
+                                  icon:
+                                    - width: 20px
+                                    - color: rgba(255,255,255,0.5)
+                      styles:
+                        grid:
+                          - grid-template-areas: '"volume_control"'
+                          - grid-template-columns: 1fr
+                          - grid-template-rows: max-content;
+                          - align-items: end
+                        card:
+                          - background: none
+                          - box-shadow: none
+                          - border-radius: 0px
+                          - border-width: 0px
+                          - padding: 0px 0px 0px 0px
+                          - margin-bottom: '-5px'
+            card_mod:
+              style: |
+                @media (max-width: 767px) {
+                :host {
+                  position: fixed !important;
+                  bottom: 8px;
+                  left: 8px;
+                  right: 8px;
+                 }
+                ha-card {
+                  background-color: rgba(0, 0, 0, 0.3); !important;
+                  -webkit-backdrop-filter: blur(10px); !important;}
+                  border-top-left-radius: 25px !important;
+                  border-top-right-radius: 25px;
+                  border-bottom-left-radius: 0px;
+                  border-bottom-right-radius: 0px;
+                  }
+                }
